@@ -11,15 +11,17 @@ public class BasicMulticast{
     Config config;
     int ID;
 
-    public BasicMultiCast(Unicast u)throws IOException{
+    public BasicMulticast(Unicast u) throws IOException {
         this.u = u;
         this.config = Config.parseConfig("configFile");
         this.ID = u.ID;
-        startListen();
     }
-    for(int i:config.idList){
-        if(i != this.ID) {
-            u.unicast_send(i, final_message);
+
+    public void multicast(String message) throws IOException, InterruptedException {
+        for (int i : config.idList) {
+            if (i != this.ID) {
+                u.unicast_send(i, message);
+            }
         }
     }
 }

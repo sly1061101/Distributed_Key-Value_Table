@@ -1,6 +1,6 @@
 package mp;
 
-public Replica_env extends Replica{
+public class Replica_env extends Replica{
     public  BasicMulticast m;
 
     @Override

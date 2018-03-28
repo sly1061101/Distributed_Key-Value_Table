@@ -1,7 +1,7 @@
 package mp;
 
-public Replica_lin extends Replica{
-    public  TotalMulticast m;
+public class Replica_lin extends Replica{
+    public TotalMulticast m;
 
     @Override
     public  void write(){

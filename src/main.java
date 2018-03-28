@@ -14,7 +14,7 @@ public class main {
         Unicast u = new Unicast( Integer.parseInt(args[0]), Config.parseConfig("configFile") );
         u.startListen();
 
-        Multicast m = new Multicast(u);
+        TotalMulticast m = new TotalMulticast(u);
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         while(true){
