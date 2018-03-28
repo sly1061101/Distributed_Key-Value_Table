@@ -119,6 +119,7 @@ public class TotalMulticast {
                     }
                 }
             }
+            Thread.sleep(100);
         }
     }
 }

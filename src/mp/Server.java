@@ -19,7 +19,7 @@ public class Server {
         listenAddress = new InetSocketAddress(address, port);
     }
 
-    public void startServer(Map<Integer, Queue<String>> messageBuffer) throws IOException {
+    public void startServer(Map<Integer, Queue<String>> messageBuffer) throws IOException, InterruptedException {
         this.selector = Selector.open();
         ServerSocketChannel serverChannel = ServerSocketChannel.open();
         serverChannel.configureBlocking(false);
@@ -54,6 +54,7 @@ public class Server {
                     this.read(key, messageBuffer);
                 }
             }
+            Thread.sleep(100);
         }
     }
 

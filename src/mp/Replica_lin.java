@@ -68,14 +68,20 @@ public class Replica_lin extends Replica {
         Runnable listener = new Runnable() {
             @Override
             public void run() {
-                listen();
+                try {
+                    listen();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         };
 
         new Thread(listener).start();
     }
 
-    private void listen() {
+    private void listen() throws IOException, InterruptedException {
         String message;
         //format of message:
         // "sender id||writeReq||key||value"
@@ -96,6 +102,7 @@ public class Replica_lin extends Replica {
                     if (senderId == tm.u.ID)
                         isWaiting = false;
                 }
+                Thread.sleep(100);
             }
         }
     }
