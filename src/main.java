@@ -12,7 +12,6 @@ public class main {
         }
 
         Unicast u = new Unicast( Integer.parseInt(args[0]), Config.parseConfig("configFile") );
-        u.startListen();
 
         TotalMulticast m = new TotalMulticast(u);
 
