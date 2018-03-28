@@ -1,12 +1,15 @@
 package mp;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Replica_lin extends Replica {
+    public HashMap<Character, Integer> map;
     public TotalMulticast tm;
     public boolean isWaiting;
 
     public Replica_lin(TotalMulticast tm) {
+        map = new HashMap<>();
         this.tm = tm;
         isWaiting = false;
         startListen();
