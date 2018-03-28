@@ -19,7 +19,7 @@ public class BasicMulticast {
     // deliever() method in BasicMulticast can deliever a message if there is a message in buffer.
     // The return value is a string, in the format of "ID||message", where ID is the source of the message
     // If there is currently no message, the method will return null.
-    public String deliever() {
+    public String deliver() {
         for (int i : u.hostInfo.idList) {
             String message;
             if( (message = u.unicast_receive(i)) != null )

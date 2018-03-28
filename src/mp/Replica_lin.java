@@ -12,11 +12,11 @@ public class Replica_lin extends Replica{
         return;
     }
     @Override
-    public  void getWriteRequest(String message)){
+    public  void getWriteRequest(String message){
         return;
     }
     @Override
-    public  void getReadRequest(String message)){
+    public  void getReadRequest(String message){
         return;
     }
 }
