@@ -34,6 +34,8 @@ public class Unicast {
                     s.startServer(messageBuffer);
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         };
