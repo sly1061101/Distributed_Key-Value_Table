@@ -28,10 +28,11 @@ public class TotalMulticast {
         });
 
         isSequencer = (u.hostInfo.idList.get(0) == u.ID);
+        //if this process is a sequencer, it must start a new thread to keep listening from other processes
         if( isSequencer ) {
             sequencerCurSeq = 0;
+            sequencerStartListen();
         }
-        startListen();
     }
 
     //To multicast a message, add the "TOSEQ" header and send it to sequencer
@@ -39,8 +40,10 @@ public class TotalMulticast {
         u.unicast_send(u.hostInfo.idList.get(0), "TOSEQ||" + message);
     }
 
-    //Deliver a message with current sequence number if exist.
-    public void deliver() {
+    // For processes except sequencer itself, if there is any message from sequencer, put them into priority queue.
+    // For sequencer, this is implemented in sequencerListen() method.
+    // Deliver a message with current sequence number if exist.
+    public String deliver() {
         String message;
 
         if( !isSequencer ) {
@@ -52,25 +55,20 @@ public class TotalMulticast {
             int seq = Integer.parseInt(msgSplit[1]);
             if (seq == curSeq) {
                 String[] messageSplit = buffer.poll().split("\\u007c\\u007c");
-                Calendar cal = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                System.out.println("Sender ID: " + messageSplit[2] + " System Time: "
-                        + sdf.format(cal.getTime()) + " Message: " + messageSplit[3]);
                 curSeq++;
+                //the message in the priority queue is in the format of "FROMSEQ||seq#||sender id||message"
+                return (messageSplit[2] + "||" + messageSplit[3]);
             }
         }
+        return null;
     }
 
-    public void startListen() {
+    public void sequencerStartListen() {
         Runnable listener = new Runnable() {
             @Override
             public void run() {
                 try {
-                    if(isSequencer)
-                        listenAndDeliver();
-                    else
-                        while(true)
-                            deliver();
+                    sequencerListen();
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
@@ -83,9 +81,14 @@ public class TotalMulticast {
     }
 
     //For sequencer, decode the message and add the headers of "FROMSEQ", SEQ#, Original host ID. Then broadcast it.
-    public void listenAndDeliver() throws IOException, InterruptedException {
+    public void sequencerListen() throws IOException, InterruptedException {
         while(true){
             for(int i = 0; i < u.hostInfo.idList.size(); ++i){
+                // if this process is sequencer and receives a message from itself,
+                // it need to judge if this is a "TOSEQ" or a "FROMSEQ" message
+                // for "TOSEQ" message, it should broadcast it
+                // for "FROMSEQ" message, it just put it into priority queue, like a normal process
+                // (for other processes, this is implemented in deliever() methods)
                 if(i == 0){
                     String message;
                     while ((message = u.unicast_receive(u.hostInfo.idList.get(i))) != null) {
@@ -115,7 +118,6 @@ public class TotalMulticast {
                     }
                 }
             }
-            deliver();
         }
     }
 }
