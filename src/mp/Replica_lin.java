@@ -80,18 +80,22 @@ public class Replica_lin extends Replica {
         //format of message:
         // "sender id||writeReq||key||value"
         // "sender id||readReq||key"
-        while( (message = tm.deliver()) != null ) {
-            int senderId = Integer.parseInt(message.substring(0, Utility.nthIndexOf(message, "||", 1)));
-            String command =  message.substring(Utility.nthIndexOf(message, "||", 1) + 2, Utility.nthIndexOf(message, "||", 2));
-            if(command.equals("writeReq")) {
-                getWriteRequest(message.substring(Utility.nthIndexOf(message, "||", 2) + 2));
-                if(senderId == tm.u.ID)
-                    isWaiting = false;
-            }
-            else if(command.equals("readReq")) {
-                getReadRequest(message.substring(Utility.nthIndexOf(message, "||", 2) + 2));
-                if(senderId == tm.u.ID)
-                    isWaiting = false;
+        while(true) {
+            if ((message = tm.deliver()) != null) {
+                int senderId = Integer.parseInt(message.substring(0, Utility.nthIndexOf(message, "||", 1)));
+                String command = message.substring(Utility.nthIndexOf(message, "||", 1) + 2, Utility.nthIndexOf(message, "||", 2));
+                if (command.equals("writeReq")) {
+                    getWriteRequest(message.substring(Utility.nthIndexOf(message, "||", 2) + 2));
+//                    System.out.println("sender ID: " +  senderId + " my ID: " + tm.u.ID);
+                    if (senderId == tm.u.ID) {
+                        isWaiting = false;
+//                        System.out.println("I have set the flag!!!");
+                    }
+                } else if (command.equals("readReq")) {
+                    getReadRequest(message.substring(Utility.nthIndexOf(message, "||", 2) + 2));
+                    if (senderId == tm.u.ID)
+                        isWaiting = false;
+                }
             }
         }
     }
