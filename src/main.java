@@ -13,19 +13,24 @@ public class main {
 
         Unicast u = new Unicast( Integer.parseInt(args[0]), Config.parseConfig("configFile") );
 
-        TotalMulticast m = new TotalMulticast(u);
+        TotalMulticast tm = new TotalMulticast(u);
+
+        Replica_lin rl = new Replica_lin(tm);
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
         while(true){
             String s = br.readLine();
             String[] strings = s.split(" ");
-            System.out.println(strings.length);
-            if(strings.length == 3){
-                u.unicast_send(Integer.parseInt(strings[1]), strings[2]);
+            if(strings[0].equals("w")) {
+                char key = strings[1].charAt(0);
+                int value = Integer.valueOf(strings[2]);
+                rl.write(key, value);
             }
-            else if(strings.length == 2){
-                // for multi cast
-                m.multicast(strings[1]);
+            if(strings[0].equals("r")) {
+                char key = strings[1].charAt(0);
+                int value = rl.read(key);
+                System.out.println(value);
             }
         }
     }
