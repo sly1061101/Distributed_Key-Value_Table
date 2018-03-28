@@ -23,6 +23,7 @@ public class Unicast {
         messageBuffer = new HashMap<>();
         for(Integer i : hostInfo.idList)
             messageBuffer.put(i, new LinkedList<>());
+        startListen();
     }
 
     public void startListen(){
