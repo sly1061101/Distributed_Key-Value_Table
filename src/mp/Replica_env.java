@@ -1,5 +1,7 @@
 package mp;
 
+import java.io.IOException;
+
 public class Replica_env extends Replica{
     public int W_value;
     public int R_value;
@@ -7,7 +9,7 @@ public class Replica_env extends Replica{
     // message encoding: key || value || operation number
     // 0 for write, 1 for read, 2 for getWriteRequest, 3 for getReadRequest
     @Override
-    public  void write(Character key, Integer value){
+    public  void write(Character key, Integer value) throws InterruptedException, IOException{
         int counter = 0;
         String message = Character.toString(key) +"||" + Integer.toString(value) + "||" + "0";
         bMulti.multicast(message);
@@ -29,25 +31,26 @@ public class Replica_env extends Replica{
     }
 
     public void startListen(int counter) {
-        Runnable listener = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while(counter < this.W_value){
-                        String receive = deliver();
-                        if(){
-                        /////// to be implemented
-
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        new Thread(listener).start();
+//        Runnable listener = new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    while(counter < W_value){
+//                        String receive = bMulti.deliver();
+//                        if(false){
+//                        /////// to be implemented
+//
+//                        }
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
+//
+//        new Thread(listener).start();
+        return;
     }
 }

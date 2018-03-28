@@ -45,7 +45,6 @@ public class Replica_lin extends Replica {
 
     @Override
     public  void getWriteRequest(String message) {
-
         return;
     }
 
