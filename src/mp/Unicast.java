@@ -1,5 +1,8 @@
 package mp;
 
+import mp.TCP.Client;
+import mp.TCP.Server;
+
 import java.io.IOException;
 import java.util.*;
 

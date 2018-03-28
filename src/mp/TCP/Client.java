@@ -1,4 +1,4 @@
-package mp;
+package mp.TCP;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
