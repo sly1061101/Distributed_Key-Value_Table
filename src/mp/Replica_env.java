@@ -1,9 +1,11 @@
 package mp;
 
 public class Replica_env extends Replica{
+    public int W_value;
+    public int R_value;
     public  BasicMulticast bMulti;
     // message encoding: key || value || operation number
-    // 0 for write, 1 for read, 2 for getWriteRequest, 3 for
+    // 0 for write, 1 for read, 2 for getWriteRequest, 3 for getReadRequest
     @Override
     public  void write(Character key, Integer value){
         int counter = 0;
@@ -14,6 +16,7 @@ public class Replica_env extends Replica{
     }
     @Override
     public  void read(Character key){
+
         return;
     }
     @Override
