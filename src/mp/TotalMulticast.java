@@ -6,14 +6,14 @@ import java.util.PriorityQueue;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class Multicast {
+public class TotalMulticast {
     Unicast u;
     int curSeq;
     PriorityQueue<String> buffer;
     boolean isSequencer;
     int sequencerCurSeq;
 
-    public Multicast(Unicast u) {
+    public TotalMulticast(Unicast u) {
         this.u = u;
         curSeq = 0;
         buffer = new PriorityQueue<>(new Comparator<String>() {
