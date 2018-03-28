@@ -4,7 +4,7 @@ public class Replica_lin extends Replica{
     public TotalMulticast m;
 
     @Override
-    public  void write(Character key, Integer value)){
+    public  void write(Character key, Integer value){
         return;
     }
     @Override
