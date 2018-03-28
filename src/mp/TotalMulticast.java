@@ -3,8 +3,6 @@ package mp;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.PriorityQueue;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class TotalMulticast {
     Unicast u;
@@ -43,6 +41,7 @@ public class TotalMulticast {
     // For processes except sequencer itself, if there is any message from sequencer, put them into priority queue.
     // For sequencer, this is implemented in sequencerListen() method.
     // Deliver a message with current sequence number if exist.
+    // the return value is in the format of "sender id||message" or null if there is no message currently
     public String deliver() {
         String message;
 
