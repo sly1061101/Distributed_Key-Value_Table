@@ -24,15 +24,25 @@ public class main {
         while(true){
             String s = br.readLine();
             String[] strings = s.split(" ");
-            if(strings[0].equals("w")) {
+            if(strings[0].equals("put")) {
                 char key = strings[1].charAt(0);
                 int value = Integer.valueOf(strings[2]);
                 c.put(key, value);
             }
-            if(strings[0].equals("r")) {
+            else if(strings[0].equals("get")) {
                 char key = strings[1].charAt(0);
                 c.get(key);
             }
+            else if(strings[0].equals("dump"))
+                c.dump();
+            else if(strings[0].equals("delay")) {
+                int ms = Integer.valueOf(strings[1]);
+                Thread.sleep(ms);
+                while(br.ready())
+                    br.readLine();
+            }
+            else
+                System.out.println("Illegal command!");
         }
     }
 }
