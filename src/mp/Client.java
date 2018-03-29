@@ -18,7 +18,9 @@ public class Client {
         try{
             PrintWriter out = new PrintWriter(new FileOutputStream(new File("log" + ID + ".txt"), true));
             out.println("666666," + ID + ",put," + key + "," + System.currentTimeMillis() + ",req," + value);
+            System.out.println("   Putting value. New command will be executed only after finishing.");
             r.write(key, value);
+            System.out.println("   Putting Finished.");
             out.println("666666," + ID + ",put," + key + "," + System.currentTimeMillis() + ",resp," + value);
             out.close();
         } catch (FileNotFoundException e) {
@@ -30,7 +32,9 @@ public class Client {
         try{
             PrintWriter out = new PrintWriter(new FileOutputStream(new File("log" + ID + ".txt"), true));
             out.println("666666," + ID + ",get," + key + "," + System.currentTimeMillis() + ",req,");
+            System.out.println("   Getting value. New command will be executed only after finishing.");
             Integer value = r.read(key);
+            System.out.println("   Getting Finished.");
             out.println("666666," + ID + ",get," + key + "," + System.currentTimeMillis() + ",resp," + value);
             out.close();
         } catch (FileNotFoundException e) {
