@@ -38,6 +38,7 @@ public class main {
             else if(strings[0].equals("delay")) {
                 int ms = Integer.valueOf(strings[1]);
                 Thread.sleep(ms);
+                //clear the input stream during sleeping
                 while(br.ready())
                     br.readLine();
             }
