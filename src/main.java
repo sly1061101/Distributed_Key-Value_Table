@@ -17,6 +17,8 @@ public class main {
 
         Replica_lin rl = new Replica_lin(tm);
 
+        Client c = new Client(rl, Integer.parseInt(args[0]));
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         while(true){
@@ -25,12 +27,11 @@ public class main {
             if(strings[0].equals("w")) {
                 char key = strings[1].charAt(0);
                 int value = Integer.valueOf(strings[2]);
-                rl.write(key, value);
+                c.put(key, value);
             }
             if(strings[0].equals("r")) {
                 char key = strings[1].charAt(0);
-                int value = rl.read(key);
-                System.out.println(value);
+                c.get(key);
             }
         }
     }
