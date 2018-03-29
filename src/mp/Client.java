@@ -37,4 +37,8 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+    public void dump() {
+        r.dump();
+    }
 }

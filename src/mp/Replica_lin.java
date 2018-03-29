@@ -2,6 +2,9 @@ package mp;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class Replica_lin extends Replica {
     public HashMap<Character, Integer> map;
@@ -62,6 +65,16 @@ public class Replica_lin extends Replica {
     public  void getReadRequest(String message) {
         //do nothing
         return;
+    }
+
+    @Override
+    public void dump() {
+        Set<Map.Entry<Character, Integer>> s = map.entrySet();
+        Iterator<Map.Entry<Character, Integer>> it = s.iterator();
+        while( it.hasNext() ) {
+            Map.Entry<Character, Integer> e = it.next();
+            System.out.println("   " + e.getKey() + " " + e.getValue());
+        }
     }
 
     private void startListen() {
