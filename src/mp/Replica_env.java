@@ -2,12 +2,9 @@ package mp;
 
 import java.io.IOException;
 import java.sql.Time;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.PriorityQueue;
 
 public class Replica_env extends Replica{
     class Pair{
@@ -183,7 +180,12 @@ public class Replica_env extends Replica{
     }
 
     @Override
-    public void dump(){
-        return;
+    public void dump() {
+        Set<Map.Entry<Character, Pair>> s = map.entrySet();
+        Iterator<Map.Entry<Character, Pair>> it = s.iterator();
+        while( it.hasNext() ) {
+            Map.Entry<Character, Pair> e = it.next();
+            System.out.println("   " + e.getKey() + " " + e.getValue().value);
+        }
     }
 }
