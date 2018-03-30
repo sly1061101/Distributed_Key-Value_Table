@@ -34,8 +34,14 @@ public class Client {
             out.println("666666," + ID + ",get," + key + "," + System.currentTimeMillis() + ",req,");
             System.out.println("   Getting value. New command will be executed only after finishing.");
             Integer value = r.read(key);
-            System.out.println("   Getting Finished.");
-            out.println("666666," + ID + ",get," + key + "," + System.currentTimeMillis() + ",resp," + value);
+            if(value != Integer.MIN_VALUE){
+                System.out.println("   Getting Finished.");
+                System.out.println("   The key is: "+ key + ",  and the value is: " + value);
+                out.println("666666," + ID + ",get," + key + "," + System.currentTimeMillis() + ",resp," + value);
+            }
+            else {
+                System.out.println("   There is no such key in the system");
+            }
             out.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

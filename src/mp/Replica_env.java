@@ -5,17 +5,9 @@ import java.sql.Time;
 import java.util.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.TimerTask;
 
 public class Replica_env extends Replica{
-    class Pair{
-        Integer value;
-        Timestamp timestamp;
-        Pair(Integer value, Timestamp timestamp){
-            this.value = value;
-            this.timestamp = timestamp;
-        }
-    }
-
     public int W_value;
     public int R_value;
 
@@ -24,12 +16,27 @@ public class Replica_env extends Replica{
     private final int get_write_req_mode = 2;
     private final int get_read_req_mode = 3;
 
-    private int count_write;
-    private int count_read;
+    private volatile int count_write;
+    private volatile int count_read;
     private Character write_key; // The key used in the write operation
     private int write_value;    // The value used in the write operation
     private Character read_key;  // The key used in the read operation
     private Pair read_pair;      // The most recent pair received when waiting for acknowledges
+
+    private volatile int max_waiting_time = 10;
+
+    class Pair{
+        Integer value;
+        Timestamp timestamp;
+        Pair(Integer value, Timestamp timestamp){
+            this.value = value;
+            this.timestamp = timestamp;
+        }
+    }
+//    class TimerTaskTest extends TimerTask{
+//        @Override
+//
+//    }
 
     private HashMap<Character, Pair> map = new HashMap<>();
     public  BasicMulticast bMulti;
@@ -42,21 +49,49 @@ public class Replica_env extends Replica{
         startListen();
     }
 
+    class TimerHelper {
+        Timer timer;
+
+        public TimerHelper(int time) {
+            int delay = 1000 * max_waiting_time;
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    System.out.println("Waited too much time, operation aborted");
+                    count_read = R_value;
+                    count_read = W_value;
+                    timer.cancel();
+                }
+            }, delay);
+        }
+
+        public void destroyTimer(){
+            this.timer.cancel();
+        }
+    }
+
     @Override
     public  void write(Character key, Integer value) {
         write_key = key;
         write_value = value;
         count_write = 0;
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+        map.put(key,new Pair(value, timestamp));
         String message = write_mode +  "||" + timestamp + "||" + key +"||" + value;
+        int i = 0;
+        TimerHelper t = null;
         try {
             bMulti.multicast(message);
+             t = new TimerHelper(max_waiting_time);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        while(count_write < W_value){}
+        while(count_write < W_value) { }
+        t.destroyTimer();
         count_write = 0;
         return;
     }
@@ -67,17 +102,21 @@ public class Replica_env extends Replica{
         ;
         count_read = 0;
         String message = read_mode + "||" + key;
+        int i=0;
+        TimerHelper t = null;
         try {
             bMulti.multicast(message);
+            t = new TimerHelper(max_waiting_time);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        while(count_read < R_value){}
+        while(count_read < R_value){ }
+        t.destroyTimer();
         count_read = 0;
-        // to be modified: avoid NOP
-        return map.getOrDefault(key, null).value;
+        Pair received = map.getOrDefault(key, null);
+        return received == null? Integer.MIN_VALUE : received.value;
     }
     @Override
     public  void getWriteRequest(String message){
@@ -91,7 +130,10 @@ public class Replica_env extends Replica{
         Character key = message.charAt(fourthSplit - 1);
         int value = Integer.parseInt(message.substring(fourthSplit + 2));
 
-        if(currrentTimestamp.after(map.getOrDefault(key, null).timestamp)){
+        if(!map.containsKey(key)){
+            map.put(key, new Pair(value, currrentTimestamp));
+        }
+        else if(currrentTimestamp.after(map.getOrDefault(key, null).timestamp)){
             map.put(key, new Pair(value, currrentTimestamp));
         }
         try{
@@ -114,7 +156,7 @@ public class Replica_env extends Replica{
 
         try{
             if(pair != null){
-                bMulti.u.unicast_send(senderId, get_read_req_mode  + pair.timestamp.toString() + "||" + key + "||" + pair.value);
+                bMulti.u.unicast_send(senderId - 1, get_read_req_mode  + "||" + pair.timestamp.toString() + "||" + key + "||" + pair.value);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -129,13 +171,19 @@ public class Replica_env extends Replica{
         Runnable listener = new Runnable() {
             @Override
             public void run() {
+                try {
                     listen();
+                }catch (IOException e){
+                    e.printStackTrace();
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
             }
         };
-
+        new Thread(listener).start();
     }
 
-    private void listen(){
+    private void listen()throws IOException, InterruptedException{
         String message;
         // format of message:
         // write: id||write_mode||timestamp||key||value
@@ -144,9 +192,13 @@ public class Replica_env extends Replica{
         //get read request: id||get_read_req_mode||timestamp||key||value
         while(true){
             if((message = bMulti.deliver()) != null){
+//                System.out.println(message);
+//                System.out.println("W: "+count_write);
+//                System.out.println("R: "+count_read);
                 int firstSplit = Utility.nthIndexOf(message, "||", 1);
                 int secondSplit = Utility.nthIndexOf(message,"||",2);
                 int mode = Integer.parseInt(message.substring(firstSplit + 2,secondSplit));
+//                System.out.println("mode: "+ mode);
                 if(mode == write_mode){
                     getWriteRequest(message);
                 }
@@ -176,6 +228,7 @@ public class Replica_env extends Replica{
                     }
                 }
             }
+            Thread.sleep(100);
         }
     }
 
