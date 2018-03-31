@@ -58,7 +58,7 @@ public class main {
                     br.readLine();
             }
             else
-                System.out.println("Illegal command!");
+                System.out.println("   Illegal command!");
         }
     }
 }

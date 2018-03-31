@@ -46,7 +46,8 @@ public class Replica_env extends Replica{
         this.bMulti = bMulti;
         count_read = 0;
         count_write = 0;
-        max_waiting_time = bMulti.u.hostInfo.maxDelay * 3;
+        //if max_delay is less than 3.33s, set max_waiting_time=10s, else set max_waiting_time=3*max_delay
+        max_waiting_time = bMulti.u.hostInfo.maxDelay < 3333? 10000 : 3*bMulti.u.hostInfo.maxDelay;
         startListen();
     }
 
