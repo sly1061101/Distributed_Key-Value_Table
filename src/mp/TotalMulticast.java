@@ -2,19 +2,19 @@ package mp;
 
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.PriorityQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class TotalMulticast {
     Unicast u;
     int curSeq;
-    PriorityQueue<String> buffer;
+    PriorityBlockingQueue<String> buffer;
     boolean isSequencer;
     int sequencerCurSeq;
 
     public TotalMulticast(Unicast u) {
         this.u = u;
         curSeq = 0;
-        buffer = new PriorityQueue<>(new Comparator<String>() {
+        buffer = new PriorityBlockingQueue<String>(10, new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
                 String[] o1Split = o1.split("\\u007C\\u007C");
@@ -35,6 +35,7 @@ public class TotalMulticast {
 
     //To multicast a message, add the "TOSEQ" header and send it to sequencer
     public void multicast(String message) throws IOException, InterruptedException {
+        //format "TOSEQ||message"
         u.unicast_send(u.hostInfo.idList.get(0), "TOSEQ||" + message);
     }
 
@@ -43,20 +44,20 @@ public class TotalMulticast {
     // Deliver a message with current sequence number if exist.
     // the return value is in the format of "sender id||message" or null if there is no message currently
     public String deliver() {
-        String message;
-
         if( !isSequencer ) {
+            String message;
             while ( (message = u.unicast_receive(u.hostInfo.idList.get(0))) != null )
                 buffer.offer(message);
         }
+
         if( buffer.size() != 0 ) {
             String[] msgSplit = buffer.peek().split("\\u007C\\u007C");
             int seq = Integer.parseInt(msgSplit[1]);
             if (seq == curSeq) {
-                String[] messageSplit = buffer.poll().split("\\u007c\\u007c");
                 curSeq++;
+                String message = buffer.poll();
                 //the message in the priority queue is in the format of "FROMSEQ||seq#||sender id||message"
-                return (messageSplit[2] + "||" + messageSplit[3]);
+                return message.substring(Utility.nthIndexOf(message, "||", 2) + 2);
             }
         }
         return null;
@@ -93,8 +94,9 @@ public class TotalMulticast {
                     while ((message = u.unicast_receive(u.hostInfo.idList.get(i))) != null) {
                         String[] msgSplit = message.split("\\u007C\\u007C");
                         if (msgSplit[0].equals("TOSEQ")) {
-                            String messageSent = message.substring(7); //remove the "TOSEQ||" header
+                            String messageSent = message.substring(Utility.nthIndexOf(message, "||", 1) + 2); //remove the "TOSEQ||" header
                             for (Integer ID : u.hostInfo.idList) {
+                                //format "FROMSEQ||seq#||sender id||message"
                                 u.unicast_send(ID, "FROMSEQ||" + sequencerCurSeq
                                         + "||" + u.hostInfo.idList.get(i) + "||" + messageSent);
                             }
@@ -108,7 +110,7 @@ public class TotalMulticast {
                 else if(i != 0) {
                     String message;
                     while ((message = u.unicast_receive(u.hostInfo.idList.get(i))) != null) {
-                        String messageSent = message.substring(7); //remove "TOSEQ||" header
+                        String messageSent = message.substring(Utility.nthIndexOf(message, "||", 1) + 2); //remove "TOSEQ||" header
                         for (Integer ID : u.hostInfo.idList) {
                             u.unicast_send(ID, "FROMSEQ||" + sequencerCurSeq
                                     + "||" + u.hostInfo.idList.get(i) + "||" + messageSent);
@@ -117,6 +119,7 @@ public class TotalMulticast {
                     }
                 }
             }
+            Thread.sleep(100);
         }
     }
 }

@@ -1,5 +1,8 @@
 package mp;
 
+import mp.TCP.Client;
+import mp.TCP.Server;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -34,6 +37,8 @@ public class Unicast {
                     s.startServer(messageBuffer);
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         };
@@ -43,13 +48,14 @@ public class Unicast {
 
     public void unicast_send(int destination, String message) throws IOException, InterruptedException{
         int delay = (int) (hostInfo.minDelay + (hostInfo.maxDelay - hostInfo.minDelay) * Math.random());
-        TimerTask unicastSend = new TimerTask() {
+        Timer t = new Timer();
+        t.schedule(new TimerTask(){
             @Override
             public void run() {
                 synchronizedSend.send(ID, c, hostInfo, destination, message);
+                t.cancel();
             }
-        };
-        new Timer().schedule(unicastSend, delay);
+        }, delay);
         //System.out.println( "Sent \"" + message + "\" to process " + destination + ", system time is " + System.currentTimeMillis() );
     }
 
