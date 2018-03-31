@@ -34,7 +34,7 @@ public class Client {
             out.println("666666," + ID + ",get," + key + "," + System.currentTimeMillis() + ",req,");
             System.out.println("   Getting value. New command will be executed only after finishing.");
             Integer value = r.read(key);
-            if(value != Integer.MIN_VALUE){
+            if(value != null){
                 System.out.println("   Getting Finished.");
                 System.out.println("   The key is: "+ key + ",  and the value is: " + value);
                 out.println("666666," + ID + ",get," + key + "," + System.currentTimeMillis() + ",resp," + value);

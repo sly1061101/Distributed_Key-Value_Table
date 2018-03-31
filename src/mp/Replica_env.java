@@ -97,8 +97,7 @@ public class Replica_env extends Replica{
     @Override
     public  Integer read(Character key){
         read_key = key;
-        read_pair = new Pair( 0, new Timestamp(System.currentTimeMillis()))
-        ;
+        read_pair = new Pair( null, new Timestamp(0));
         count_read = 0;
         String message = read_mode + "||" + key;
         TimerHelper t = null;
@@ -113,8 +112,7 @@ public class Replica_env extends Replica{
         while(count_read < R_value){ }
         t.destroyTimer();
         count_read = 0;
-        Pair received = map.getOrDefault(key, null);
-        return received == null? Integer.MIN_VALUE : received.value;
+        return read_pair.value;
     }
     @Override
     public  void getWriteRequest(String message){
@@ -155,6 +153,8 @@ public class Replica_env extends Replica{
         try{
             if(pair != null){
                 bMulti.u.unicast_send(senderId, get_read_req_mode  + "||" + pair.timestamp.toString() + "||" + key + "||" + pair.value);
+            } else {
+                bMulti.u.unicast_send(senderId, get_read_req_mode  + "||" + new Timestamp(0).toString() + "||" + key + "||" + null);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -216,7 +216,7 @@ public class Replica_env extends Replica{
                     int fourthSplit = Utility.nthIndexOf(message, "||", 4);
                     Timestamp timestamp = Timestamp.valueOf(message.substring(secondSplit + 2, thirdSplit));
                     Character key = message.charAt(fourthSplit - 1);
-                    Integer value = Integer.parseInt(message.substring(fourthSplit + 2));
+                    Integer value = message.substring(fourthSplit + 2).equals("null") ? null : Integer.parseInt(message.substring(fourthSplit + 2));
                     if(key == read_key) {
                         count_read++;
                         if (timestamp.after(read_pair.timestamp)) {
