@@ -149,14 +149,14 @@ public class Replica_env extends Replica{
     public  void getReadRequest(String message){
         int firstSplit = Utility.nthIndexOf(message, "||", 1);
         int secondSplit = Utility.nthIndexOf(message, "||", 2);
-        int senderId = Integer.parseInt(message.substring(firstSplit + 2, secondSplit));
+        int senderId = Integer.parseInt(message.substring(0, firstSplit));
         Character key = message.charAt(secondSplit + 2);
 
         Pair pair = map.getOrDefault(key, null);
 
         try{
             if(pair != null){
-                bMulti.u.unicast_send(senderId - 1, get_read_req_mode  + "||" + pair.timestamp.toString() + "||" + key + "||" + pair.value);
+                bMulti.u.unicast_send(senderId, get_read_req_mode  + "||" + pair.timestamp.toString() + "||" + key + "||" + pair.value);
             }
         } catch (IOException e) {
             e.printStackTrace();
