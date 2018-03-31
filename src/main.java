@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class main {
+    public static Unicast u;
     public static BasicMulticast bm;
     public static Replica_env re;
     public static TotalMulticast tm;
@@ -13,8 +14,8 @@ public class main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        Unicast u = new Unicast( Integer.parseInt(args[0]), Config.parseConfig("configFile") );
         if(args.length == 4 && args[1].equals("eve")){
+            u = new Unicast( Integer.parseInt(args[0]), Config.parseConfig("configFile") );
             bm = new BasicMulticast(u);
             re = new Replica_env(bm);
             c = new Client(re, Integer.parseInt(args[0]));
@@ -22,6 +23,8 @@ public class main {
             re.R_value = Integer.parseInt(args[3]);
         }
         else if(args.length == 2 && args[1].equals("lin")){
+            u = new Unicast( Integer.parseInt(args[0]), Config.parseConfig("configFile") );
+
             tm = new TotalMulticast(u);
 
             rl = new Replica_lin(tm);
@@ -58,7 +61,7 @@ public class main {
                     br.readLine();
             }
             else
-                System.out.println("Illegal command!");
+                System.out.println("   Illegal command!");
         }
     }
 }
