@@ -23,7 +23,7 @@ public class Replica_env extends Replica{
     private Character read_key;  // The key used in the read operation
     private Pair read_pair;      // The most recent pair received when waiting for acknowledges
 
-    private volatile int max_waiting_time = 10;
+    private volatile int max_waiting_time;
 
     class Pair{
         Integer value;
@@ -46,14 +46,14 @@ public class Replica_env extends Replica{
         this.bMulti = bMulti;
         count_read = 0;
         count_write = 0;
+        max_waiting_time = bMulti.u.hostInfo.maxDelay * 3;
         startListen();
     }
 
     class TimerHelper {
         Timer timer;
 
-        public TimerHelper(int time) {
-            int delay = 1000 * max_waiting_time;
+        public TimerHelper(int delay) {
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -80,7 +80,6 @@ public class Replica_env extends Replica{
 
         map.put(key,new Pair(value, timestamp));
         String message = write_mode +  "||" + timestamp + "||" + key +"||" + value;
-        int i = 0;
         TimerHelper t = null;
         try {
             bMulti.multicast(message);
@@ -102,7 +101,6 @@ public class Replica_env extends Replica{
         ;
         count_read = 0;
         String message = read_mode + "||" + key;
-        int i=0;
         TimerHelper t = null;
         try {
             bMulti.multicast(message);
