@@ -16,13 +16,12 @@ public class Client {
 
     public void put(Character key, Integer value) {
         try{
-//            PrintWriter out = new PrintWriter(new FileOutputStream(new File("log" + ID + ".txt"), true));
-            PrintWriter out = new PrintWriter(new FileOutputStream(new File("log.txt"), true));
-            out.println(ID + ",put," + key + "," + System.currentTimeMillis() + ",req," + value);
+            PrintWriter out = new PrintWriter(new FileOutputStream(new File("log" + ID + ".txt"), true));
+            out.println("666666," + ID + ",put," + key + "," + System.currentTimeMillis() + ",req," + value);
             System.out.println("   Putting value. New command will be executed only after finishing.");
             r.write(key, value);
             System.out.println("   Putting Finished.");
-            out.println(ID + ",put," + key + "," + System.currentTimeMillis() + ",resp," + value);
+            out.println("666666," + ID + ",put," + key + "," + System.currentTimeMillis() + ",resp," + value);
             out.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -31,15 +30,14 @@ public class Client {
 
     public void get(Character key) {
         try{
-//            PrintWriter out = new PrintWriter(new FileOutputStream(new File("log" + ID + ".txt"), true));
-            PrintWriter out = new PrintWriter(new FileOutputStream(new File("log.txt"), true));
-            out.println(ID + ",get," + key + "," + System.currentTimeMillis() + ",req,");
+            PrintWriter out = new PrintWriter(new FileOutputStream(new File("log" + ID + ".txt"), true));
+            out.println("666666," + ID + ",get," + key + "," + System.currentTimeMillis() + ",req,");
             System.out.println("   Getting value. New command will be executed only after finishing.");
             Integer value = r.read(key);
             if(value != Integer.MIN_VALUE){
                 System.out.println("   Getting Finished.");
                 System.out.println("   The key is: "+ key + ",  and the value is: " + value);
-                out.println(ID + ",get," + key + "," + System.currentTimeMillis() + ",resp," + value);
+                out.println("666666," + ID + ",get," + key + "," + System.currentTimeMillis() + ",resp," + value);
             }
             else {
                 System.out.println("   There is no such key in the system");
